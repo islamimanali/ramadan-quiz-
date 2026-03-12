@@ -145,6 +145,8 @@
   .lb-info { flex: 1; }
   .lb-score-val { font-weight: 900; color: var(--gold); font-size: 20px; margin-left: 10px; }
   .lb-waiting { text-align: center; padding: 40px 20px; color: rgba(245,240,232,0.4); font-size: 15px; }
+  .lb-waiting .spinner { width: 40px; height: 40px; border: 3px solid var(--dark3); border-top-color: var(--gold); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
   .lb-count { display: inline-block; background: var(--dark3); padding: 6px 14px; border-radius: 20px; font-size: 13px; color: var(--gold); margin-bottom: 20px; }
   .ornament { color: var(--gold); font-size: 24px; margin-bottom: 20px; opacity: 0.5; text-align: center; }
   .btn-group { width: 100%; display: flex; flex-direction: column; gap: 10px; }
@@ -215,6 +217,10 @@
   </div>
 </div>
 <script>
+var BIN_ID = "69b2dd72aa77b81da9dc05d7";
+var API_KEY = "$2a$10$7.vntml04LyZGEiDSCIuVeASRfi/qOMDI3EFse4w2CbuFisXtTyje";
+var BIN_URL = "https://api.jsonbin.io/v3/b/" + BIN_ID;
+
 var questions = [
   { q: "Рамазан айы Ислам дінінің қай парызына жатады?", o: ["Намаз", "Ораза", "Зекет", "Қажылық"], a: 1, d: "easy" },
   { q: "Бір күнде неше уақыт намаз оқылады?", o: ["3", "4", "5", "7"], a: 2, d: "easy" },
@@ -232,9 +238,11 @@ var questions = [
   { q: "«Ләә иләәһә иллаллаһ» — бұл қай сөз?", o: ["Салауат", "Келимә шаһадат", "Дұға", "Аят"], a: 1, d: "medium" },
   { q: "Құранда неше сүре бар?", o: ["30", "99", "114", "120"], a: 2, d: "medium" }
 ];
+
 var current = 0, score = 0, playerName = "", timerInterval = null, timeLeft = 0;
 var totalTime = 0, answered = 0, myResultId = "";
 var allResults = [];
+
 var starsEl = document.getElementById('stars');
 for (var i = 0; i < 80; i++) {
   var s = document.createElement('div');
@@ -245,23 +253,60 @@ for (var i = 0; i < 80; i++) {
   s.style.width = s.style.height = (Math.random()*2+1)+'px';
   starsEl.appendChild(s);
 }
-function loadResults() {
-  try { allResults = JSON.parse(localStorage.getItem('ramadan_quiz_lb') || '[]'); } catch(e) { allResults = []; }
+
+function loadResults(callback) {
+  fetch(BIN_URL + "/latest", {
+    method: "GET",
+    headers: { "X-Master-Key": API_KEY }
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (data && data.record && data.record.resultts) {
+      allResults = data.record.resultts;
+    } else if (data && data.record && data.record.results) {
+      allResults = data.record.results;
+    } else {
+      allResults = [];
+    }
+    if (callback) callback();
+  })
+  .catch(function(e) {
+    console.error("Load error:", e);
+    allResults = [];
+    if (callback) callback();
+  });
 }
-function saveResultToStorage() {
-  try { localStorage.setItem('ramadan_quiz_lb', JSON.stringify(allResults)); } catch(e) {}
+
+function saveResults(callback) {
+  fetch(BIN_URL, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Master-Key": API_KEY
+    },
+    body: JSON.stringify({ resultts: allResults })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) { if (callback) callback(); })
+  .catch(function(e) {
+    console.error("Save error:", e);
+    if (callback) callback();
+  });
 }
+
 function showScreen(id) {
   var screens = document.querySelectorAll('.screen');
   for (var i = 0; i < screens.length; i++) screens[i].classList.remove('active');
   document.getElementById(id).classList.add('active');
 }
+
 function startQuiz() {
   playerName = document.getElementById('nameInput').value.trim() || 'Қонақ';
   current = 0; score = 0; totalTime = 0; answered = 0;
   showScreen('quizScreen');
   loadQuestion();
 }
+
 function loadQuestion() {
   if (current >= questions.length) return finishQuiz();
   var q = questions[current];
@@ -295,6 +340,7 @@ function loadQuestion() {
     if (timeLeft <= 0) { clearInterval(timerInterval); selectAnswer(-1); }
   }, 1000);
 }
+
 function selectAnswer(idx) {
   clearInterval(timerInterval);
   var q = questions[current];
@@ -315,15 +361,13 @@ function selectAnswer(idx) {
   current++;
   setTimeout(loadQuestion, 1800);
 }
+
 function finishQuiz() {
   document.getElementById('progressFill').style.width = '100%';
   var avgT = answered > 0 ? Math.round(totalTime/answered) : 0;
   var pct = Math.round(score/15*100);
-  loadResults();
   myResultId = 'id_' + Date.now();
-  allResults.push({ id: myResultId, name: playerName, score: score, total: 15, avgTime: avgT, percent: pct });
-  allResults.sort(function(a,b) { return b.score - a.score || a.avgTime - b.avgTime; });
-  saveResultToStorage();
+
   showScreen('resultScreen');
   document.getElementById('resultName').textContent = playerName;
   document.getElementById('resultScore').textContent = score;
@@ -339,34 +383,45 @@ function finishQuiz() {
   else { msg = '💪 Тырыс!'; sub = 'Келесі жолы жақсырақ болады!'; }
   document.getElementById('resultMsg').textContent = msg;
   document.getElementById('resultSub').textContent = sub;
+
+  loadResults(function() {
+    allResults.push({ id: myResultId, name: playerName, score: score, total: 15, avgTime: avgT, percent: pct });
+    allResults.sort(function(a,b) { return b.score - a.score || a.avgTime - b.avgTime; });
+    saveResults();
+  });
 }
+
 function showLeaderboardScreen() { showScreen('leaderboardScreen'); renderLeaderboard(); }
 function showLeaderboardOnly() { showScreen('leaderboardScreen'); renderLeaderboard(); }
 function refreshLeaderboard() { renderLeaderboard(); }
+
 function renderLeaderboard() {
   var listEl = document.getElementById('lbList');
-  loadResults();
-  document.getElementById('lbCount').textContent = allResults.length + ' қатысушы';
-  if (allResults.length === 0) {
-    listEl.innerHTML = '<div class="lb-waiting">Әзірге ешкім ойнаған жоқ. Бірінші бол! 🚀</div>';
-    return;
-  }
-  var html = '';
-  for (var i = 0; i < allResults.length; i++) {
-    var e = allResults[i];
-    var cls = '';
-    if (i === 0) cls = 'gold';
-    else if (i === 1) cls = 'silver';
-    else if (i === 2) cls = 'bronze';
-    var isMe = e.id === myResultId;
-    html += '<div class="lb-entry ' + cls + (isMe ? ' me' : '') + '">';
-    html += '<span class="lb-rank">' + (i+1) + '</span>';
-    html += '<div class="lb-info"><div class="lb-name">' + e.name + (isMe ? ' ← сен' : '') + '</div>';
-    html += '<div class="lb-detail">' + e.percent + '% | орташа ' + e.avgTime + 'с</div></div>';
-    html += '<span class="lb-score-val">' + e.score + '/15</span></div>';
-  }
-  listEl.innerHTML = html;
+  listEl.innerHTML = '<div class="lb-waiting"><div class="spinner"></div>Жүктелуде...</div>';
+  loadResults(function() {
+    document.getElementById('lbCount').textContent = allResults.length + ' қатысушы';
+    if (allResults.length === 0) {
+      listEl.innerHTML = '<div class="lb-waiting">Әзірге ешкім ойнаған жоқ. Бірінші бол! 🚀</div>';
+      return;
+    }
+    var html = '';
+    for (var i = 0; i < allResults.length; i++) {
+      var e = allResults[i];
+      var cls = '';
+      if (i === 0) cls = 'gold';
+      else if (i === 1) cls = 'silver';
+      else if (i === 2) cls = 'bronze';
+      var isMe = e.id === myResultId;
+      html += '<div class="lb-entry ' + cls + (isMe ? ' me' : '') + '">';
+      html += '<span class="lb-rank">' + (i+1) + '</span>';
+      html += '<div class="lb-info"><div class="lb-name">' + e.name + (isMe ? ' ← сен' : '') + '</div>';
+      html += '<div class="lb-detail">' + e.percent + '% | орташа ' + e.avgTime + 'с</div></div>';
+      html += '<span class="lb-score-val">' + e.score + '/15</span></div>';
+    }
+    listEl.innerHTML = html;
+  });
 }
+
 function restartQuiz() { showScreen('welcomeScreen'); document.getElementById('nameInput').value = ''; }
 document.getElementById('nameInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') startQuiz(); });
 </script>
