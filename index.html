@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Auyz ashar викторинасы</title>
+<title>Ауыз ашар викторинасы</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -145,8 +145,6 @@
   .lb-info { flex: 1; }
   .lb-score-val { font-weight: 900; color: var(--gold); font-size: 20px; margin-left: 10px; }
   .lb-waiting { text-align: center; padding: 40px 20px; color: rgba(245,240,232,0.4); font-size: 15px; }
-  .lb-waiting .spinner { width: 40px; height: 40px; border: 3px solid var(--dark3); border-top-color: var(--gold); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px; }
-  @keyframes spin { to { transform: rotate(360deg); } }
   .lb-count { display: inline-block; background: var(--dark3); padding: 6px 14px; border-radius: 20px; font-size: 13px; color: var(--gold); margin-bottom: 20px; }
   .ornament { color: var(--gold); font-size: 24px; margin-bottom: 20px; opacity: 0.5; text-align: center; }
   .btn-group { width: 100%; display: flex; flex-direction: column; gap: 10px; }
@@ -163,15 +161,15 @@
 <div class="container">
   <div class="screen active" id="welcomeScreen">
     <div class="moon"></div>
-    <div class="title">Auyz ashar viktorinasy</div>
-    <div class="subtitle">15 surak - Bilimindi tekser!</div>
-    <div class="ornament">--- --- ---</div>
+    <div class="title">&#127769; Ауыз ашар викторинасы</div>
+    <div class="subtitle">15 сұрақ · Біліміңді тексер!</div>
+    <div class="ornament">✦ — ✦ — ✦</div>
     <div class="input-group">
-      <label>Atynydy zhaz:</label>
-      <input type="text" id="nameInput" placeholder="Mysaly: Ali" autocomplete="off">
+      <label>Атыңды жаз:</label>
+      <input type="text" id="nameInput" placeholder="Мысалы: Әлі" autocomplete="off">
     </div>
-    <button class="btn" onclick="startQuiz()">Bastau</button>
-    <button class="btn-secondary" onclick="showLeaderboardOnly()">Natizhelardi koru</button>
+    <button class="btn" onclick="startQuiz()">Бастау ▸</button>
+    <button class="btn-secondary" onclick="showLeaderboardOnly()">🏅 Нәтижелерді көру</button>
   </div>
   <div class="screen" id="quizScreen">
     <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
@@ -194,45 +192,45 @@
     <div class="result-msg" id="resultMsg"></div>
     <div class="result-sub" id="resultSub"></div>
     <div class="stats-grid">
-      <div class="stat-card"><div class="stat-value" id="statCorrect">0</div><div class="stat-label">Durys</div></div>
-      <div class="stat-card"><div class="stat-value" id="statWrong">0</div><div class="stat-label">Kate</div></div>
-      <div class="stat-card"><div class="stat-value" id="statTime">0s</div><div class="stat-label">Ortasha uakyt</div></div>
-      <div class="stat-card"><div class="stat-value" id="statPercent">0%</div><div class="stat-label">Paiyyz</div></div>
+      <div class="stat-card"><div class="stat-value" id="statCorrect">0</div><div class="stat-label">Дұрыс ✓</div></div>
+      <div class="stat-card"><div class="stat-value" id="statWrong">0</div><div class="stat-label">Қате ✗</div></div>
+      <div class="stat-card"><div class="stat-value" id="statTime">0с</div><div class="stat-label">Орташа уақыт</div></div>
+      <div class="stat-card"><div class="stat-value" id="statPercent">0%</div><div class="stat-label">Пайыз</div></div>
     </div>
     <div class="btn-group">
-      <button class="btn" onclick="showLeaderboardScreen()">Barlyk natizhelardi koru</button>
-      <button class="btn-outline" onclick="restartQuiz()">Kaita bastau</button>
+      <button class="btn" onclick="showLeaderboardScreen()">🏅 Барлық нәтижелерді көру</button>
+      <button class="btn-outline" onclick="restartQuiz()">Қайта бастау ↻</button>
     </div>
   </div>
   <div class="screen" id="leaderboardScreen">
     <div class="moon" style="width:70px;height:70px;margin-bottom:20px;"></div>
-    <div class="lb-title">Koshbashylar kestesi</div>
-    <div class="lb-subtitle">Barlyk katysushylardyn natijesi</div>
+    <div class="lb-title">🏅 Көшбасшылар кестесі</div>
+    <div class="lb-subtitle">Барлық қатысушылардың нәтижесі</div>
     <div class="lb-count" id="lbCount"></div>
     <div class="lb-list" id="lbList"></div>
     <div class="btn-group">
-      <button class="btn-outline" onclick="refreshLeaderboard()">Zhanartu</button>
-      <button class="btn-secondary" onclick="restartQuiz()">Basty bet</button>
+      <button class="btn-outline" onclick="refreshLeaderboard()">🔄 Жаңарту</button>
+      <button class="btn-secondary" onclick="restartQuiz()">← Басты бет</button>
     </div>
   </div>
 </div>
 <script>
 var questions = [
-  { q: "Ramazan ajy Islam dininin kai paryzyna zhatady?", o: ["Namaz", "Oraza", "Zeket", "Kazhylyk"], a: 1, d: "easy" },
-  { q: "Bir kunde neshe uakyt namaz okylydy?", o: ["3", "4", "5", "7"], a: 2, d: "easy" },
-  { q: "Orazany ashudy kalai ataidy?", o: ["Sari", "Iftar", "Meiram", "Sadaka"], a: 1, d: "easy" },
-  { q: "Kai zhemispen oraza ashu - sunnet?", o: ["Alma", "Kurma", "Zhuzim", "Banan"], a: 1, d: "easy" },
-  { q: "Islam dininin kasietti kitaby kalai atalady?", o: ["Inzhil", "Taurat", "Kuran Karim", "Zabur"], a: 2, d: "easy" },
-  { q: "Kuran kai tilde tusken?", o: ["Parsy", "Turik", "Arab", "Kazak"], a: 2, d: "easy" },
-  { q: "Ramazannan keiingi meiram kalai atalady?", o: ["Kurban ait", "Oraza ait", "Nauryz", "Maulid"], a: 1, d: "easy" },
-  { q: "Musulmandardyn kiblasy - kai kala?", o: ["Madina", "Mekke", "Ierusalim", "Stambul"], a: 1, d: "easy" },
-  { q: "Allahtnyn neshe esimi (sipaty) bar?", o: ["33", "77", "99", "100"], a: 2, d: "easy" },
-  { q: "Bismillah sozinin magnasy ne?", o: ["Allah uly", "Allahtyn atymen", "Allahka shukir", "Allah saktasyn"], a: 1, d: "easy" },
-  { q: "Kuran neshe zhyl ishinde tolyk tusirilgen?", o: ["10 zhyl", "23 zhyl", "30 zhyl", "40 zhyl"], a: 1, d: "medium" },
-  { q: "Ramazan - hizhira kuntizbesinin neshinshi ajy?", o: ["7-shi", "9-shy", "10-shy", "12-shi"], a: 1, d: "medium" },
-  { q: "Paigambarymyz Muhammad (s.a.s.) kai kalada duniege kelgen?", o: ["Madina", "Mekke", "Ierusalim", "Taif"], a: 1, d: "medium" },
-  { q: "Laa ilaaha illallah - bul kai soz?", o: ["Salauuat", "Kelima shahadat", "Duga", "Ayat"], a: 1, d: "medium" },
-  { q: "Kuranda neshe sure bar?", o: ["30", "99", "114", "120"], a: 2, d: "medium" }
+  { q: "Рамазан айы Ислам дінінің қай парызына жатады?", o: ["Намаз", "Ораза", "Зекет", "Қажылық"], a: 1, d: "easy" },
+  { q: "Бір күнде неше уақыт намаз оқылады?", o: ["3", "4", "5", "7"], a: 2, d: "easy" },
+  { q: "Оразаны ашуды қалай атайды?", o: ["Сәрі", "Ифтар", "Мейрам", "Садақа"], a: 1, d: "easy" },
+  { q: "Қай жеміспен ораза ашу — сүннет?", o: ["Алма", "Құрма", "Жүзім", "Банан"], a: 1, d: "easy" },
+  { q: "Ислам дінінің қасиетті кітабы қалай аталады?", o: ["Інжіл", "Таурат", "Құран Кәрім", "Забур"], a: 2, d: "easy" },
+  { q: "Құран қай тілде түскен?", o: ["Парсы", "Түрік", "Араб", "Қазақ"], a: 2, d: "easy" },
+  { q: "Рамазаннан кейінгі мейрам қалай аталады?", o: ["Құрбан айт", "Ораза айт", "Наурыз", "Мәулід"], a: 1, d: "easy" },
+  { q: "Мұсылмандардың қибласы — қай қала?", o: ["Мәдина", "Мекке", "Иерусалим", "Стамбұл"], a: 1, d: "easy" },
+  { q: "Аллаһтың неше есімі (сипаты) бар?", o: ["33", "77", "99", "100"], a: 2, d: "easy" },
+  { q: "«Бісміллаһ» сөзінің мағынасы не?", o: ["Аллаһ ұлы", "Аллаһтың атымен", "Аллаһқа шүкір", "Аллаһ сақтасын"], a: 1, d: "easy" },
+  { q: "Құран неше жыл ішінде толық түсірілген?", o: ["10 жыл", "23 жыл", "30 жыл", "40 жыл"], a: 1, d: "medium" },
+  { q: "Рамазан — хижра күнтізбесінің нешінші айы?", o: ["7-ші", "9-шы", "10-шы", "12-ші"], a: 1, d: "medium" },
+  { q: "Пайғамбарымыз Мұхаммед (с.а.с.) қай қалада дүниеге келген?", o: ["Мәдина", "Мекке", "Иерусалим", "Тайф"], a: 1, d: "medium" },
+  { q: "«Ләә иләәһә иллаллаһ» — бұл қай сөз?", o: ["Салауат", "Келимә шаһадат", "Дұға", "Аят"], a: 1, d: "medium" },
+  { q: "Құранда неше сүре бар?", o: ["30", "99", "114", "120"], a: 2, d: "medium" }
 ];
 var current = 0, score = 0, playerName = "", timerInterval = null, timeLeft = 0;
 var totalTime = 0, answered = 0, myResultId = "";
@@ -259,7 +257,7 @@ function showScreen(id) {
   document.getElementById(id).classList.add('active');
 }
 function startQuiz() {
-  playerName = document.getElementById('nameInput').value.trim() || 'Konak';
+  playerName = document.getElementById('nameInput').value.trim() || 'Қонақ';
   current = 0; score = 0; totalTime = 0; answered = 0;
   showScreen('quizScreen');
   loadQuestion();
@@ -274,11 +272,11 @@ function loadQuestion() {
   document.getElementById('timer').textContent = timeLeft;
   document.getElementById('timer').className = 'timer';
   var badge = document.getElementById('diffBadge');
-  badge.textContent = q.d === 'easy' ? 'Zhenil' : 'Ortasha';
+  badge.textContent = q.d === 'easy' ? '🟢 Жеңіл' : '🟡 Орташа';
   badge.className = 'difficulty-badge ' + (q.d === 'easy' ? 'difficulty-easy' : 'difficulty-medium');
   document.getElementById('qText').textContent = q.q;
   document.getElementById('feedbackArea').innerHTML = '';
-  var letters = ['A','B','V','G'];
+  var letters = ['А','Б','В','Г'];
   var optEl = document.getElementById('options');
   optEl.innerHTML = '';
   for (var i = 0; i < q.o.length; i++) {
@@ -311,9 +309,9 @@ function selectAnswer(idx) {
     if (i !== q.a && i !== idx) opts[i].classList.add('disabled');
   }
   var fb = document.getElementById('feedbackArea');
-  if (idx === q.a) { score++; fb.innerHTML = '<div class="feedback correct-fb">Durys! Zharaisyn!</div>'; }
-  else if (idx === -1) { fb.innerHTML = '<div class="feedback wrong-fb">Uakyt bitti!</div>'; }
-  else { fb.innerHTML = '<div class="feedback wrong-fb">Kate! Durys zhauap: ' + q.o[q.a] + '</div>'; }
+  if (idx === q.a) { score++; fb.innerHTML = '<div class="feedback correct-fb">✓ Дұрыс! Жарайсың!</div>'; }
+  else if (idx === -1) { fb.innerHTML = '<div class="feedback wrong-fb">⏱ Уақыт бітті!</div>'; }
+  else { fb.innerHTML = '<div class="feedback wrong-fb">✗ Қате! Дұрыс жауап: ' + q.o[q.a] + '</div>'; }
   current++;
   setTimeout(loadQuestion, 1800);
 }
@@ -331,14 +329,14 @@ function finishQuiz() {
   document.getElementById('resultScore').textContent = score;
   document.getElementById('statCorrect').textContent = score;
   document.getElementById('statWrong').textContent = 15 - score;
-  document.getElementById('statTime').textContent = avgT + 's';
+  document.getElementById('statTime').textContent = avgT + 'с';
   document.getElementById('statPercent').textContent = pct + '%';
   var msg, sub;
-  if (score >= 14) { msg = 'Keremet!'; sub = 'Sen nagyz bilimpaz!'; }
-  else if (score >= 11) { msg = 'Ote zhaksy!'; sub = 'Bilimin mykty eken!'; }
-  else if (score >= 8) { msg = 'Zhaksy!'; sub = 'Zhaman emes, zhalgastyr!'; }
-  else if (score >= 5) { msg = 'Ortasha'; sub = 'Bilimdi terendetu kerek!'; }
-  else { msg = 'Tyrys!'; sub = 'Kelesi zholy zhaksyrak bolady!'; }
+  if (score >= 14) { msg = '🏆 Керемет!'; sub = 'Сен нағыз білімпаз!'; }
+  else if (score >= 11) { msg = '🌟 Өте жақсы!'; sub = 'Білімің мықты екен!'; }
+  else if (score >= 8) { msg = '👍 Жақсы!'; sub = 'Жаман емес, жалғастыр!'; }
+  else if (score >= 5) { msg = '📚 Орташа'; sub = 'Білімді тереңдету керек!'; }
+  else { msg = '💪 Тырыс!'; sub = 'Келесі жолы жақсырақ болады!'; }
   document.getElementById('resultMsg').textContent = msg;
   document.getElementById('resultSub').textContent = sub;
 }
@@ -348,12 +346,11 @@ function refreshLeaderboard() { renderLeaderboard(); }
 function renderLeaderboard() {
   var listEl = document.getElementById('lbList');
   loadResults();
-  document.getElementById('lbCount').textContent = allResults.length + ' katyssushy';
+  document.getElementById('lbCount').textContent = allResults.length + ' қатысушы';
   if (allResults.length === 0) {
-    listEl.innerHTML = '<div class="lb-waiting">Azirge eshkim oynagan zhok. Birinshi bol!</div>';
+    listEl.innerHTML = '<div class="lb-waiting">Әзірге ешкім ойнаған жоқ. Бірінші бол! 🚀</div>';
     return;
   }
-  var medals = ['1','2','3'];
   var html = '';
   for (var i = 0; i < allResults.length; i++) {
     var e = allResults[i];
@@ -364,8 +361,8 @@ function renderLeaderboard() {
     var isMe = e.id === myResultId;
     html += '<div class="lb-entry ' + cls + (isMe ? ' me' : '') + '">';
     html += '<span class="lb-rank">' + (i+1) + '</span>';
-    html += '<div class="lb-info"><div class="lb-name">' + e.name + (isMe ? ' - sen' : '') + '</div>';
-    html += '<div class="lb-detail">' + e.percent + '% | ortasha ' + e.avgTime + 's</div></div>';
+    html += '<div class="lb-info"><div class="lb-name">' + e.name + (isMe ? ' ← сен' : '') + '</div>';
+    html += '<div class="lb-detail">' + e.percent + '% | орташа ' + e.avgTime + 'с</div></div>';
     html += '<span class="lb-score-val">' + e.score + '/15</span></div>';
   }
   listEl.innerHTML = html;
