@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Auyz ashar викторинасы</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #D4A843;
+    --gold-light: #F0D68A;
+    --dark: #0A1628;
+    --dark2: #111D35;
+    --dark3: #1A2A4A;
+    --green: #2ECC71;
+    --red: #E74C3C;
+    --white: #F5F0E8;
+    --cream: #FFF8EC;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Noto Sans', sans-serif;
+    background: var(--dark);
+    color: var(--white);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+  .star { position: absolute; width: 2px; height: 2px; background: rgba(255,255,255,0.6); border-radius: 50%; animation: twinkle 3s infinite alternate; }
+  @keyframes twinkle { 0% { opacity: 0.3; } 100% { opacity: 1; } }
+  .container {
+    position: relative; z-index: 1; max-width: 600px; margin: 0 auto; padding: 20px;
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .screen { display: none; width: 100%; }
+  .screen.active { display: flex; flex-direction: column; align-items: center; }
+  .moon {
+    width: 120px; height: 120px;
+    background: radial-gradient(circle at 35% 35%, var(--gold-light), var(--gold));
+    border-radius: 50%;
+    box-shadow: 0 0 60px rgba(212,168,67,0.4), 0 0 120px rgba(212,168,67,0.15);
+    margin-bottom: 30px; position: relative; animation: float 4s ease-in-out infinite;
+  }
+  .moon::after {
+    content: ''; position: absolute; top: 15px; left: 10px;
+    width: 90px; height: 90px; background: var(--dark); border-radius: 50%; opacity: 0.85;
+  }
+  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+  .title { font-size: 28px; font-weight: 900; color: var(--gold); text-align: center; margin-bottom: 10px; }
+  .subtitle { font-size: 16px; color: rgba(245,240,232,0.6); text-align: center; margin-bottom: 40px; }
+  .input-group { width: 100%; margin-bottom: 20px; }
+  .input-group label { display: block; font-size: 14px; color: var(--gold); margin-bottom: 8px; font-weight: 600; }
+  .input-group input {
+    width: 100%; padding: 16px 20px; background: var(--dark2); border: 2px solid var(--dark3);
+    border-radius: 16px; color: #FFFFFF; font-size: 18px; font-family: 'Noto Sans', sans-serif; outline: none; transition: border-color 0.3s;
+  }
+  .input-group input:focus { border-color: var(--gold); }
+  .input-group input::placeholder { color: rgba(255,255,255,0.35); }
+  .btn {
+    padding: 16px 48px; background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    color: var(--dark); border: none; border-radius: 16px; font-size: 18px; font-weight: 700;
+    font-family: 'Noto Sans', sans-serif; cursor: pointer; transition: all 0.3s; width: 100%; margin-top: 10px;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(212,168,67,0.3); }
+  .btn:active { transform: translateY(0); }
+  .btn-outline {
+    padding: 14px 48px; background: transparent; border: 2px solid var(--gold); color: var(--gold);
+    border-radius: 16px; font-size: 16px; font-weight: 700; font-family: 'Noto Sans', sans-serif;
+    cursor: pointer; transition: all 0.3s; width: 100%;
+  }
+  .btn-outline:hover { background: rgba(212,168,67,0.1); }
+  .btn-secondary {
+    padding: 14px 48px; background: var(--dark3); border: none; color: #FFFFFF; border-radius: 16px;
+    font-size: 16px; font-weight: 700; font-family: 'Noto Sans', sans-serif; cursor: pointer;
+    transition: all 0.3s; width: 100%; margin-top: 10px;
+  }
+  .btn-secondary:hover { background: rgba(26,42,74,0.8); }
+  .progress-bar { width: 100%; height: 6px; background: var(--dark3); border-radius: 3px; margin-bottom: 20px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--gold-light)); border-radius: 3px; transition: width 0.5s ease; }
+  .question-header { display: flex; justify-content: space-between; width: 100%; margin-bottom: 12px; font-size: 14px; color: rgba(245,240,232,0.5); }
+  .question-number { color: var(--gold); font-weight: 700; }
+  .timer { color: var(--gold-light); font-weight: 700; font-size: 16px; }
+  .timer.warning { color: var(--red); animation: pulse 0.5s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+  .difficulty-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-bottom: 16px; }
+  .difficulty-easy { background: rgba(46,204,113,0.15); color: #2ECC71; border: 1px solid rgba(46,204,113,0.3); }
+  .difficulty-medium { background: rgba(243,156,18,0.15); color: #F39C12; border: 1px solid rgba(243,156,18,0.3); }
+  .question-text { font-size: 22px; font-weight: 700; text-align: center; margin-bottom: 30px; line-height: 1.4; color: #4DA6FF; text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+  .options { width: 100%; display: flex; flex-direction: column; gap: 12px; }
+  .option {
+    width: 100%; padding: 18px 20px; background: var(--dark2); border: 2px solid var(--dark3); border-radius: 16px;
+    color: #4DA6FF; font-size: 16px; font-family: 'Noto Sans', sans-serif; font-weight: 600;
+    cursor: pointer; transition: all 0.3s; text-align: left; display: flex; align-items: center; gap: 14px;
+  }
+  .option:hover { border-color: var(--gold); background: var(--dark3); }
+  .option .letter {
+    width: 36px; height: 36px; border-radius: 10px; background: var(--dark3);
+    display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 14px; color: var(--gold); flex-shrink: 0;
+  }
+  .option.correct { border-color: var(--green); background: rgba(46,204,113,0.1); animation: correctPop 0.4s ease; }
+  .option.correct .letter { background: var(--green); color: var(--dark); }
+  .option.wrong { border-color: var(--red); background: rgba(231,76,60,0.1); animation: shake 0.4s ease; }
+  .option.wrong .letter { background: var(--red); color: white; }
+  .option.disabled { pointer-events: none; opacity: 0.5; }
+  @keyframes correctPop { 0% { transform: scale(1); } 50% { transform: scale(1.03); } 100% { transform: scale(1); } }
+  @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+  .feedback { margin-top: 20px; padding: 16px 24px; border-radius: 14px; font-size: 16px; font-weight: 700; text-align: center; animation: fadeUp 0.3s ease; }
+  .feedback.correct-fb { background: rgba(46,204,113,0.12); color: var(--green); border: 1px solid rgba(46,204,113,0.3); }
+  .feedback.wrong-fb { background: rgba(231,76,60,0.12); color: var(--red); border: 1px solid rgba(231,76,60,0.3); }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .result-circle {
+    width: 160px; height: 160px; border-radius: 50%; border: 6px solid var(--gold);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 24px; background: var(--dark2);
+  }
+  .result-score { font-size: 52px; font-weight: 900; color: var(--gold); line-height: 1; }
+  .result-total { font-size: 16px; color: rgba(245,240,232,0.5); margin-top: 4px; }
+  .result-msg { font-size: 22px; font-weight: 700; text-align: center; margin-bottom: 8px; color: #FFFFFF; }
+  .result-sub { font-size: 15px; color: rgba(245,240,232,0.5); text-align: center; margin-bottom: 24px; }
+  .result-name { font-size: 18px; color: var(--gold); font-weight: 700; margin-bottom: 20px; }
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; margin-bottom: 24px; }
+  .stat-card { background: var(--dark2); border: 1px solid var(--dark3); border-radius: 14px; padding: 16px; text-align: center; }
+  .stat-value { font-size: 28px; font-weight: 900; color: var(--gold); }
+  .stat-label { font-size: 12px; color: rgba(245,240,232,0.5); margin-top: 4px; }
+  .lb-title { font-size: 24px; font-weight: 900; color: var(--gold); margin-bottom: 8px; text-align: center; }
+  .lb-subtitle { font-size: 14px; color: rgba(245,240,232,0.5); margin-bottom: 24px; text-align: center; }
+  .lb-list { width: 100%; margin-bottom: 24px; }
+  .lb-entry {
+    display: flex; align-items: center; padding: 14px 16px; background: var(--dark2);
+    border: 1px solid var(--dark3); border-radius: 14px; margin-bottom: 10px; animation: fadeUp 0.4s ease;
+  }
+  .lb-entry.gold { border-color: var(--gold); background: rgba(212,168,67,0.1); }
+  .lb-entry.silver { border-color: #C0C0C0; background: rgba(192,192,192,0.06); }
+  .lb-entry.bronze { border-color: #CD7F32; background: rgba(205,127,50,0.06); }
+  .lb-entry.me { box-shadow: 0 0 0 2px var(--gold), 0 0 20px rgba(212,168,67,0.15); }
+  .lb-rank {
+    width: 40px; height: 40px; border-radius: 50%; background: var(--dark3);
+    display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 16px;
+    color: var(--gold); margin-right: 14px; flex-shrink: 0;
+  }
+  .lb-entry.gold .lb-rank { background: var(--gold); color: var(--dark); }
+  .lb-entry.silver .lb-rank { background: #C0C0C0; color: var(--dark); }
+  .lb-entry.bronze .lb-rank { background: #CD7F32; color: var(--dark); }
+  .lb-name { font-weight: 700; font-size: 16px; color: #FFFFFF; }
+  .lb-detail { font-size: 12px; color: rgba(245,240,232,0.4); margin-top: 2px; }
+  .lb-info { flex: 1; }
+  .lb-score-val { font-weight: 900; color: var(--gold); font-size: 20px; margin-left: 10px; }
+  .lb-waiting { text-align: center; padding: 40px 20px; color: rgba(245,240,232,0.4); font-size: 15px; }
+  .lb-waiting .spinner { width: 40px; height: 40px; border: 3px solid var(--dark3); border-top-color: var(--gold); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .lb-count { display: inline-block; background: var(--dark3); padding: 6px 14px; border-radius: 20px; font-size: 13px; color: var(--gold); margin-bottom: 20px; }
+  .ornament { color: var(--gold); font-size: 24px; margin-bottom: 20px; opacity: 0.5; text-align: center; }
+  .btn-group { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+  @media (max-width: 400px) {
+    .question-text { font-size: 18px; }
+    .option { padding: 14px 16px; font-size: 14px; }
+    .title { font-size: 24px; }
+    .result-score { font-size: 44px; }
+  }
+</style>
+</head>
+<body>
+<div class="stars" id="stars"></div>
+<div class="container">
+  <div class="screen active" id="welcomeScreen">
+    <div class="moon"></div>
+    <div class="title">Auyz ashar viktorinasy</div>
+    <div class="subtitle">15 surak - Bilimindi tekser!</div>
+    <div class="ornament">--- --- ---</div>
+    <div class="input-group">
+      <label>Atynydy zhaz:</label>
+      <input type="text" id="nameInput" placeholder="Mysaly: Ali" autocomplete="off">
+    </div>
+    <button class="btn" onclick="startQuiz()">Bastau</button>
+    <button class="btn-secondary" onclick="showLeaderboardOnly()">Natizhelardi koru</button>
+  </div>
+  <div class="screen" id="quizScreen">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="question-header">
+      <span class="question-number" id="qNumber"></span>
+      <span class="timer" id="timer">20</span>
+    </div>
+    <span class="difficulty-badge" id="diffBadge"></span>
+    <div class="question-text" id="qText"></div>
+    <div class="options" id="options"></div>
+    <div id="feedbackArea"></div>
+  </div>
+  <div class="screen" id="resultScreen">
+    <div class="moon" style="width:80px;height:80px;margin-bottom:20px;"></div>
+    <div class="result-name" id="resultName"></div>
+    <div class="result-circle">
+      <div class="result-score" id="resultScore">0</div>
+      <div class="result-total">/ 15</div>
+    </div>
+    <div class="result-msg" id="resultMsg"></div>
+    <div class="result-sub" id="resultSub"></div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-value" id="statCorrect">0</div><div class="stat-label">Durys</div></div>
+      <div class="stat-card"><div class="stat-value" id="statWrong">0</div><div class="stat-label">Kate</div></div>
+      <div class="stat-card"><div class="stat-value" id="statTime">0s</div><div class="stat-label">Ortasha uakyt</div></div>
+      <div class="stat-card"><div class="stat-value" id="statPercent">0%</div><div class="stat-label">Paiyyz</div></div>
+    </div>
+    <div class="btn-group">
+      <button class="btn" onclick="showLeaderboardScreen()">Barlyk natizhelardi koru</button>
+      <button class="btn-outline" onclick="restartQuiz()">Kaita bastau</button>
+    </div>
+  </div>
+  <div class="screen" id="leaderboardScreen">
+    <div class="moon" style="width:70px;height:70px;margin-bottom:20px;"></div>
+    <div class="lb-title">Koshbashylar kestesi</div>
+    <div class="lb-subtitle">Barlyk katysushylardyn natijesi</div>
+    <div class="lb-count" id="lbCount"></div>
+    <div class="lb-list" id="lbList"></div>
+    <div class="btn-group">
+      <button class="btn-outline" onclick="refreshLeaderboard()">Zhanartu</button>
+      <button class="btn-secondary" onclick="restartQuiz()">Basty bet</button>
+    </div>
+  </div>
+</div>
+<script>
+var questions = [
+  { q: "Ramazan ajy Islam dininin kai paryzyna zhatady?", o: ["Namaz", "Oraza", "Zeket", "Kazhylyk"], a: 1, d: "easy" },
+  { q: "Bir kunde neshe uakyt namaz okylydy?", o: ["3", "4", "5", "7"], a: 2, d: "easy" },
+  { q: "Orazany ashudy kalai ataidy?", o: ["Sari", "Iftar", "Meiram", "Sadaka"], a: 1, d: "easy" },
+  { q: "Kai zhemispen oraza ashu - sunnet?", o: ["Alma", "Kurma", "Zhuzim", "Banan"], a: 1, d: "easy" },
+  { q: "Islam dininin kasietti kitaby kalai atalady?", o: ["Inzhil", "Taurat", "Kuran Karim", "Zabur"], a: 2, d: "easy" },
+  { q: "Kuran kai tilde tusken?", o: ["Parsy", "Turik", "Arab", "Kazak"], a: 2, d: "easy" },
+  { q: "Ramazannan keiingi meiram kalai atalady?", o: ["Kurban ait", "Oraza ait", "Nauryz", "Maulid"], a: 1, d: "easy" },
+  { q: "Musulmandardyn kiblasy - kai kala?", o: ["Madina", "Mekke", "Ierusalim", "Stambul"], a: 1, d: "easy" },
+  { q: "Allahtnyn neshe esimi (sipaty) bar?", o: ["33", "77", "99", "100"], a: 2, d: "easy" },
+  { q: "Bismillah sozinin magnasy ne?", o: ["Allah uly", "Allahtyn atymen", "Allahka shukir", "Allah saktasyn"], a: 1, d: "easy" },
+  { q: "Kuran neshe zhyl ishinde tolyk tusirilgen?", o: ["10 zhyl", "23 zhyl", "30 zhyl", "40 zhyl"], a: 1, d: "medium" },
+  { q: "Ramazan - hizhira kuntizbesinin neshinshi ajy?", o: ["7-shi", "9-shy", "10-shy", "12-shi"], a: 1, d: "medium" },
+  { q: "Paigambarymyz Muhammad (s.a.s.) kai kalada duniege kelgen?", o: ["Madina", "Mekke", "Ierusalim", "Taif"], a: 1, d: "medium" },
+  { q: "Laa ilaaha illallah - bul kai soz?", o: ["Salauuat", "Kelima shahadat", "Duga", "Ayat"], a: 1, d: "medium" },
+  { q: "Kuranda neshe sure bar?", o: ["30", "99", "114", "120"], a: 2, d: "medium" }
+];
+var current = 0, score = 0, playerName = "", timerInterval = null, timeLeft = 0;
+var totalTime = 0, answered = 0, myResultId = "";
+var allResults = [];
+var starsEl = document.getElementById('stars');
+for (var i = 0; i < 80; i++) {
+  var s = document.createElement('div');
+  s.className = 'star';
+  s.style.left = Math.random()*100+'%';
+  s.style.top = Math.random()*100+'%';
+  s.style.animationDelay = Math.random()*3+'s';
+  s.style.width = s.style.height = (Math.random()*2+1)+'px';
+  starsEl.appendChild(s);
+}
+function loadResults() {
+  try { allResults = JSON.parse(localStorage.getItem('ramadan_quiz_lb') || '[]'); } catch(e) { allResults = []; }
+}
+function saveResultToStorage() {
+  try { localStorage.setItem('ramadan_quiz_lb', JSON.stringify(allResults)); } catch(e) {}
+}
+function showScreen(id) {
+  var screens = document.querySelectorAll('.screen');
+  for (var i = 0; i < screens.length; i++) screens[i].classList.remove('active');
+  document.getElementById(id).classList.add('active');
+}
+function startQuiz() {
+  playerName = document.getElementById('nameInput').value.trim() || 'Konak';
+  current = 0; score = 0; totalTime = 0; answered = 0;
+  showScreen('quizScreen');
+  loadQuestion();
+}
+function loadQuestion() {
+  if (current >= questions.length) return finishQuiz();
+  var q = questions[current];
+  var tl = q.d === 'easy' ? 15 : 20;
+  timeLeft = tl;
+  document.getElementById('progressFill').style.width = ((current)/questions.length*100)+'%';
+  document.getElementById('qNumber').textContent = (current+1) + ' / ' + questions.length;
+  document.getElementById('timer').textContent = timeLeft;
+  document.getElementById('timer').className = 'timer';
+  var badge = document.getElementById('diffBadge');
+  badge.textContent = q.d === 'easy' ? 'Zhenil' : 'Ortasha';
+  badge.className = 'difficulty-badge ' + (q.d === 'easy' ? 'difficulty-easy' : 'difficulty-medium');
+  document.getElementById('qText').textContent = q.q;
+  document.getElementById('feedbackArea').innerHTML = '';
+  var letters = ['A','B','V','G'];
+  var optEl = document.getElementById('options');
+  optEl.innerHTML = '';
+  for (var i = 0; i < q.o.length; i++) {
+    var btn = document.createElement('button');
+    btn.className = 'option';
+    btn.innerHTML = '<span class="letter">' + letters[i] + '</span><span>' + q.o[i] + '</span>';
+    btn.setAttribute('data-idx', i);
+    btn.onclick = function() { selectAnswer(parseInt(this.getAttribute('data-idx'))); };
+    optEl.appendChild(btn);
+  }
+  clearInterval(timerInterval);
+  timerInterval = setInterval(function() {
+    timeLeft--;
+    document.getElementById('timer').textContent = timeLeft;
+    if (timeLeft <= 5) document.getElementById('timer').className = 'timer warning';
+    if (timeLeft <= 0) { clearInterval(timerInterval); selectAnswer(-1); }
+  }, 1000);
+}
+function selectAnswer(idx) {
+  clearInterval(timerInterval);
+  var q = questions[current];
+  var tl = q.d === 'easy' ? 15 : 20;
+  totalTime += tl - timeLeft;
+  answered++;
+  var opts = document.querySelectorAll('.option');
+  for (var i = 0; i < opts.length; i++) {
+    opts[i].style.pointerEvents = 'none';
+    if (i === q.a) opts[i].classList.add('correct');
+    if (i === idx && idx !== q.a) opts[i].classList.add('wrong');
+    if (i !== q.a && i !== idx) opts[i].classList.add('disabled');
+  }
+  var fb = document.getElementById('feedbackArea');
+  if (idx === q.a) { score++; fb.innerHTML = '<div class="feedback correct-fb">Durys! Zharaisyn!</div>'; }
+  else if (idx === -1) { fb.innerHTML = '<div class="feedback wrong-fb">Uakyt bitti!</div>'; }
+  else { fb.innerHTML = '<div class="feedback wrong-fb">Kate! Durys zhauap: ' + q.o[q.a] + '</div>'; }
+  current++;
+  setTimeout(loadQuestion, 1800);
+}
+function finishQuiz() {
+  document.getElementById('progressFill').style.width = '100%';
+  var avgT = answered > 0 ? Math.round(totalTime/answered) : 0;
+  var pct = Math.round(score/15*100);
+  loadResults();
+  myResultId = 'id_' + Date.now();
+  allResults.push({ id: myResultId, name: playerName, score: score, total: 15, avgTime: avgT, percent: pct });
+  allResults.sort(function(a,b) { return b.score - a.score || a.avgTime - b.avgTime; });
+  saveResultToStorage();
+  showScreen('resultScreen');
+  document.getElementById('resultName').textContent = playerName;
+  document.getElementById('resultScore').textContent = score;
+  document.getElementById('statCorrect').textContent = score;
+  document.getElementById('statWrong').textContent = 15 - score;
+  document.getElementById('statTime').textContent = avgT + 's';
+  document.getElementById('statPercent').textContent = pct + '%';
+  var msg, sub;
+  if (score >= 14) { msg = 'Keremet!'; sub = 'Sen nagyz bilimpaz!'; }
+  else if (score >= 11) { msg = 'Ote zhaksy!'; sub = 'Bilimin mykty eken!'; }
+  else if (score >= 8) { msg = 'Zhaksy!'; sub = 'Zhaman emes, zhalgastyr!'; }
+  else if (score >= 5) { msg = 'Ortasha'; sub = 'Bilimdi terendetu kerek!'; }
+  else { msg = 'Tyrys!'; sub = 'Kelesi zholy zhaksyrak bolady!'; }
+  document.getElementById('resultMsg').textContent = msg;
+  document.getElementById('resultSub').textContent = sub;
+}
+function showLeaderboardScreen() { showScreen('leaderboardScreen'); renderLeaderboard(); }
+function showLeaderboardOnly() { showScreen('leaderboardScreen'); renderLeaderboard(); }
+function refreshLeaderboard() { renderLeaderboard(); }
+function renderLeaderboard() {
+  var listEl = document.getElementById('lbList');
+  loadResults();
+  document.getElementById('lbCount').textContent = allResults.length + ' katyssushy';
+  if (allResults.length === 0) {
+    listEl.innerHTML = '<div class="lb-waiting">Azirge eshkim oynagan zhok. Birinshi bol!</div>';
+    return;
+  }
+  var medals = ['1','2','3'];
+  var html = '';
+  for (var i = 0; i < allResults.length; i++) {
+    var e = allResults[i];
+    var cls = '';
+    if (i === 0) cls = 'gold';
+    else if (i === 1) cls = 'silver';
+    else if (i === 2) cls = 'bronze';
+    var isMe = e.id === myResultId;
+    html += '<div class="lb-entry ' + cls + (isMe ? ' me' : '') + '">';
+    html += '<span class="lb-rank">' + (i+1) + '</span>';
+    html += '<div class="lb-info"><div class="lb-name">' + e.name + (isMe ? ' - sen' : '') + '</div>';
+    html += '<div class="lb-detail">' + e.percent + '% | ortasha ' + e.avgTime + 's</div></div>';
+    html += '<span class="lb-score-val">' + e.score + '/15</span></div>';
+  }
+  listEl.innerHTML = html;
+}
+function restartQuiz() { showScreen('welcomeScreen'); document.getElementById('nameInput').value = ''; }
+document.getElementById('nameInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') startQuiz(); });
+</script>
+</body>
+</html>
